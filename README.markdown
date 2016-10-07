@@ -2,7 +2,16 @@
 
 A comprehensive easy to use and powerful .NET configuration library, fully covered with unit tests and tested in the wild on thousands of servers and applications.
 
-This library eliminates the problem of having configuration in different places, having to convert types between different providers, hardcoding configuration keys accross the solution, depending on specific configuration source implementation. It's doing that by exposing an abstract configuration interface and providing most common implementation for configuration sources like app.config, environment variables etc.
+## Purpose
+
+Config.Net addresses the following problems:
+
+* Configuration in multiple places
+* Converting types between different providers
+* Hardcoded configuration keys accross the solution
+* Abstracts specific configuration source implementation 
+
+Config.Net accomplishes this by exposing an abstract configuration interface and provides most common implementations for configuration sources like app.config, environment variables etc.
 
 > **Note:** Current version (v2) is not compatible with v1. If you need to come back to v1 documentation please follow [this link.](https://github.com/aloneguid/config/blob/master/README.v1.markdown)
 
@@ -18,11 +27,11 @@ var clientSecret = ConfigurationManager.AppSettings["AuthClientSecret"];
 
 You would guess that this code is trying to read a configuration setting from the local app.config file by name and that might be true, however there are numerous problems with this approach:
 
-* settings are referenced by a hardcoded string name which is prone to typos and therefore crashes in runtime.
-* there is no easy way to find out where a particular setting is used in code, except for performing a fulltext search (provided that the string was not mistyped)
-* if you decide to store configuration in a different place the code must be rewritten.
+* Settings are referenced by a hardcoded string name which is prone to typos and therefore crashes in runtime.
+* There is no easy way to find out where a particular setting is used in code, except for performing a fulltext search (provided that the string was not mistyped)
+* If you decide to store configuration in a different place the code must be rewritten.
 
-Welcome to Config.Net which solves most of those problems. Let's rewrite this abomination using Config.Net approach. First, we need to define a configuration container which describes which settings are used in your application or a library:
+Welcome to Config.Net which solves most of those problems. Let's rewrite this abomination using the Config.Net approach. First, we need to define a configuration container which describes which settings are used in your application or a library:
 
 
 ### Declare Settings Container
@@ -44,14 +53,14 @@ public class AllSettings : SettingsContainer
 ```
 
 Let's go through this code snippet:
-* We have declared `AllSettings` class which will store configuration for oru application. All configuration classes must derive from `SettingsContainer`.
+* We have declared `AllSettings` class which will store configuration for your application. All configuration classes must derive from `SettingsContainer`.
 * Two strong-typed configuration options were declared. Note they are both `readonly` which is another plus towards code quality.
-* `Option<T>` is a configuration option definition in Config.Net where generic parameter specifies the type.
-* `OnConfigure` mehtod implementation specifies that app.config should be used as a configuration store.
+* `Option<T>` is a configuration option definition in Config.Net where the generic parameter specifies the type.
+* `OnConfigure` method implementation specifies that app.config should be used as a configuration store.
 
 ### Use Settings
 
-Once container has been defined start using the settings, for instance:
+Once a container has been defined, start using the settings. For instance:
 
 ```csharp
 var c = new AllSettings();
@@ -60,14 +69,14 @@ string clientId = c.AuthClientId;
 string clientSecret = c.AuthClientSecret;
 ```
 
-Two things worth to note in this snippet:
+Two things worth noting in this snippet:
 * An instance of `AllSettings` container was created. Normally you would create an instance of a settings container per application instance for performance reasons.
 * The settings were read from the settings container. Note the syntax and that for example `AuthClientId` is defined as an `Option<string>` but casted to `string`. This is because `Option<T>` class has implicit casting operator to `T` defined.
 
 
 ### Using Multiple Sources
 
-`OnConfigure` method is used to prepare settings container for use. You can use it to add multiple configuration sources. To get the list of sources use IntelliSense (type dot-Use after `configuration`). For instance this method implementation:
+`OnConfigure` method is used to prepare settings container for use. You can use it to add multiple configuration sources. To get the list of sources use IntelliSense (type dot-Use after `configuration`). For instance: 
 
 ```csharp
 protected override void OnConfigure(IConfigConfiguration configuration)
@@ -78,7 +87,7 @@ protected override void OnConfigure(IConfigConfiguration configuration)
 
 ```
 
-causes the container to use both app.config and environment variables as configuration source.
+This method implementation causes the container to use both app.config and environment variables as configuration source.
 
 The order in which sources are added is important - Config.Net will try to read the source in the configured order and return the value from the first store where it exists.
 
@@ -95,7 +104,7 @@ Config.Net will write the value to the first store which supports writing. If no
 
 ## Caching
 
-By defalut config.net caches configuration values for 1 hour. After that it will read it again from the list of configured stores. If you want to change it to something else set the variable in the `OnConfigure` method:
+By default Config.Net caches configuration values for 1 hour. After that it will read it again from the list of configured stores. If you want to change it to something else set the variable in the `OnConfigure` method:
 
 ```csharp
 protected override void OnConfigure(IConfigConfiguration configuration)
@@ -107,7 +116,7 @@ protected override void OnConfigure(IConfigConfiguration configuration)
 }
 ```
 
-setting it to `TimeSpan.Zero` disables caching completely.
+Setting `CacheTimeout` to `TimeSpan.Zero` disables caching completely.
 
 
 # Available Stores
